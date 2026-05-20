@@ -1,0 +1,65 @@
+# Copyright (C) 2024 Matulo Gabor a Mirko Ondrejka
+# This file is distributed under the MIT license.
+msgid ""
+msgstr ""
+"Project-Id-Version: M4W SK Company Fields 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: cs_CZ\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);\n"
+"X-Generator: M4W SK Company Fields\n"
+
+#: m4w-woo-sk-company-fields.php:126
+msgid "Fakturačné údaje firmy"
+msgstr "Fakturační údaje firmy"
+
+#: m4w-woo-sk-company-fields.php:133
+msgid "Zobraziť polia pre firmu na pokladni"
+msgstr "Zobrazit pole pro firmu na pokladně"
+
+#: m4w-woo-sk-company-fields.php:143 m4w-woo-sk-company-fields.php:144
+msgid "Firemné polia"
+msgstr "Firemní pole"
+
+#: m4w-woo-sk-company-fields.php:157
+msgid "Firemné polia (IČO, DIČ, IČ DPH)"
+msgstr "Firemní pole (IČO, DIČ, IČ DPH)"
+
+#: m4w-woo-sk-company-fields.php:177
+msgid "Zobraziť polia IČO, DIČ, IČ DPH a \"Nakupujem na firmu\" na pokladni"
+msgstr "Zobrazit pole IČO, DIČ, IČ DPH a \"Nakupuji na firmu\" na pokladně"
+
+#: m4w-woo-sk-company-fields.php:198 m4w-woo-sk-company-fields.php:232
+#: m4w-woo-sk-company-fields.php:276 m4w-woo-sk-company-fields.php:277
+#: m4w-woo-sk-company-fields.php:364 m4w-woo-sk-company-fields.php:424
+msgid "IČO"
+msgstr "IČO"
+
+#: m4w-woo-sk-company-fields.php:199 m4w-woo-sk-company-fields.php:236
+#: m4w-woo-sk-company-fields.php:283 m4w-woo-sk-company-fields.php:284
+#: m4w-woo-sk-company-fields.php:367 m4w-woo-sk-company-fields.php:430
+msgid "DIČ"
+msgstr "DIČ"
+
+#: m4w-woo-sk-company-fields.php:200 m4w-woo-sk-company-fields.php:240
+#: m4w-woo-sk-company-fields.php:290 m4w-woo-sk-company-fields.php:291
+#: m4w-woo-sk-company-fields.php:370 m4w-woo-sk-company-fields.php:436
+msgid "IČ DPH"
+msgstr "IČ DPH"
+
+#: m4w-woo-sk-company-fields.php:268 m4w-woo-sk-company-fields.php:394
+#: m4w-woo-sk-company-fields.php:415
+msgid "Nakupujem na firmu"
+msgstr "Nakupuji na firmu"
+
+#: m4w-woo-sk-company-fields.php:362
+msgid "Detaily spoločnosti"
+msgstr "Detaily společnosti"
+
+#: m4w-woo-sk-company-fields.php:332
+msgid "Ak nakupujete na firmu, zadajte aspoň IČO."
+msgstr "Pokud nakupujete na firmu, zadejte alespoň IČO."

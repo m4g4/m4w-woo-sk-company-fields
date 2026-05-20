@@ -1,0 +1,13 @@
+#billing_company_customer_field {
+    margin-bottom: 0;
+}
+
+#vat_admin_fields {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.order-vat-checkbox {
+    margin-bottom: 10px;
+}
