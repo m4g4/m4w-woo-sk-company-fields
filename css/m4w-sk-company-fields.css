@@ -11,3 +11,10 @@
 .order-vat-checkbox {
     margin-bottom: 10px;
 }
+
+.m4w-validation-error {
+    color: var(--wc-red, currentColor);
+    display: block;
+    font-size: 0.85em;
+    margin-top: 4px;
+}

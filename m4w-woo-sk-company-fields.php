@@ -2,17 +2,18 @@
 /*
  * Plugin Name: M4W SK Company Fields
  * Description: IČO, DIČ, IČ DPH a "Nakupujem na firmu" polia pre WooCommerce checkout (SK/CZ).
- * Version: 1.0.0
- * Author: Matulo Gabor a Mirko Ondrejka
+ * Version: 1.1.0
+ * Author: m4g4
  * License: MIT
  * Text Domain: m4w-sk-company-fields
+ * Domain Path: /languages
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.0.0' );
+define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.1.0' );
 define( 'M4W_SK_COMPANY_FIELDS_DIR', __DIR__ );
 
 class M4W_SK_Company_Fields {
@@ -343,11 +344,34 @@ class M4W_SK_Company_Fields {
 			return;
 		}
 
-		if ( empty( $this->get_posted_field( self::FIELD_ICO ) ) ) {
+		$ico    = $this->get_posted_field( self::FIELD_ICO );
+		$dic    = $this->get_posted_field( self::FIELD_DIC );
+		$ic_dph = $this->get_posted_field( self::FIELD_IC_DPH );
+
+		if ( empty( $ico ) ) {
 			wc_add_notice(
 				__( 'Ak nakupujete na firmu, zadajte aspoň IČO.', 'm4w-sk-company-fields' ),
 				'error'
 			);
+		} else {
+			$ico_error = self::validate_ico( $ico );
+			if ( $ico_error ) {
+				wc_add_notice( $ico_error, 'error' );
+			}
+		}
+
+		if ( ! empty( $dic ) ) {
+			$dic_error = self::validate_dic( $dic );
+			if ( $dic_error ) {
+				wc_add_notice( $dic_error, 'error' );
+			}
+		}
+
+		if ( ! empty( $ic_dph ) ) {
+			$ic_dph_error = self::validate_ic_dph( $ic_dph );
+			if ( $ic_dph_error ) {
+				wc_add_notice( $ic_dph_error, 'error' );
+			}
 		}
 	}
 
@@ -463,6 +487,60 @@ class M4W_SK_Company_Fields {
 			echo esc_html__( 'IČ DPH', 'm4w-sk-company-fields' ) . ': ' . esc_html( $ic_dph ) . '<br/>';
 		}
 	}*/
+
+	public static function validate_ico( $ico ) {
+		$ico = preg_replace( '/\s+/', '', $ico );
+
+		if ( ! preg_match( '/^\d{8}$/', $ico ) ) {
+			return __( 'IČO musí mať presne 8 číslic.', 'm4w-sk-company-fields' );
+		}
+
+		$weights = array( 8, 7, 6, 5, 4, 3, 2 );
+		$sum     = 0;
+		for ( $i = 0; $i < 7; $i++ ) {
+			$sum += intval( $ico[ $i ] ) * $weights[ $i ];
+		}
+
+		$remainder = $sum % 11;
+
+		if ( $remainder === 0 ) {
+			$check = 1;
+		} elseif ( $remainder === 1 ) {
+			return __( 'Zadané IČO nie je platné (neplatný kontrolný súčet).', 'm4w-sk-company-fields' );
+		} else {
+			$check = 11 - $remainder;
+		}
+
+		if ( intval( $ico[7] ) !== $check ) {
+			return __( 'Zadané IČO nie je platné (neplatný kontrolný súčet).', 'm4w-sk-company-fields' );
+		}
+
+		return '';
+	}
+
+	public static function validate_dic( $dic ) {
+		$dic = preg_replace( '/\s+/', '', $dic );
+
+		if ( ! preg_match( '/^\d{10}$/', $dic ) ) {
+			return __( 'DIČ musí mať presne 10 číslic.', 'm4w-sk-company-fields' );
+		}
+
+		return '';
+	}
+
+	public static function validate_ic_dph( $ic_dph ) {
+		$ic_dph = preg_replace( '/\s+/', '', strtoupper( $ic_dph ) );
+
+		if ( preg_match( '/^SK\d{10}$/', $ic_dph ) ) {
+			return '';
+		}
+
+		if ( preg_match( '/^CZ\d{8,10}$/', $ic_dph ) ) {
+			return '';
+		}
+
+		return __( 'IČ DPH musí byť v tvare SK za ktorým nasleduje 10 číslic (napr. SK1234567890).', 'm4w-sk-company-fields' );
+	}
 
 	public static function get_ico( $order ) {
 		return self::get_order_meta( $order, self::FIELD_ICO );
