@@ -595,6 +595,21 @@ class M4W_SK_Company_Fields {
 	}
 }
 
-if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ), true ) ) {
-	new M4W_SK_Company_Fields();
+if ( ! function_exists( 'm4w_sk_company_fields_bootstrap' ) ) {
+	function m4w_sk_company_fields_bootstrap() {
+		static $loaded = false;
+
+		if ( $loaded || ( ! class_exists( 'WooCommerce' ) && ! function_exists( 'WC' ) ) ) {
+			return;
+		}
+
+		$loaded = true;
+		new M4W_SK_Company_Fields();
+	}
+}
+
+if ( did_action( 'plugins_loaded' ) ) {
+	m4w_sk_company_fields_bootstrap();
+} else {
+	add_action( 'plugins_loaded', 'm4w_sk_company_fields_bootstrap', 0 );
 }
