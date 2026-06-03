@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1
+- Fixed My account fields bug - when OPTION_COMPANY_FIELDS_ENABLED is now checked when displaying fields under "My Account".
+
 ## 1.1.0
 
 - Added IČO validation (8 digits + checksum mod 11) on checkout and admin invoice creation

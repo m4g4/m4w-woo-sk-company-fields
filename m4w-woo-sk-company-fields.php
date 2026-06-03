@@ -2,7 +2,7 @@
 /*
  * Plugin Name: M4W SK Company Fields
  * Description: IČO, DIČ, IČ DPH a "Nakupujem na firmu" polia pre WooCommerce checkout (SK/CZ).
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: m4g4
  * License: MIT
  * Text Domain: m4w-sk-company-fields
@@ -420,6 +420,10 @@ class M4W_SK_Company_Fields {
 	}
 
 	public function add_account_fields() {
+		if ( ! get_option( self::OPTION_COMPANY_FIELDS_ENABLED ) ) {
+			return;
+		}
+
 		$user_id         = get_current_user_id();
 		$company_customer = $this->get_user_company_field( $user_id, self::FIELD_BUY_ON_COMPANY );
 		$ico             = $this->get_user_company_field( $user_id, self::FIELD_ICO );
