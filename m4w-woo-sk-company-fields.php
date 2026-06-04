@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: M4W SK Company Fields
- * Description: IČO, DIČ, IČ DPH a "Nakupujem na firmu" polia pre WooCommerce checkout (SK/CZ).
+ * Description: IČO, DIČ, IČ DPH and "Company purchase" fields for WooCommerce checkout (SK/CZ).
  * Version: 1.1.1
  * Author: m4g4
  * License: MIT
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.1.0' );
+define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.1.1' );
 define( 'M4W_SK_COMPANY_FIELDS_DIR', __DIR__ );
 
 class M4W_SK_Company_Fields {
@@ -40,7 +40,7 @@ class M4W_SK_Company_Fields {
 			'default' => [],
 		];
 
-		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
+
 		add_action( 'admin_menu', [ $this, 'register_page' ] );
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 
@@ -65,13 +65,6 @@ class M4W_SK_Company_Fields {
 		}
 	}
 
-	public function load_textdomain() {
-		load_plugin_textdomain(
-			'm4w-sk-company-fields',
-			false,
-			dirname( plugin_basename( __FILE__ ) ) . '/languages/'
-		);
-	}
 
 	public function enqueue_styles() {
 		if ( ! is_checkout() && ! is_account_page() ) {
@@ -98,6 +91,14 @@ class M4W_SK_Company_Fields {
 			M4W_SK_COMPANY_FIELDS_VERSION,
 			true
 		);
+
+		wp_localize_script( 'm4w-sk-company-fields', 'm4w_sk_company_fields_params', [
+			'ico_length_error'   => __( 'IČO must have exactly 8 digits.', 'm4w-sk-company-fields' ),
+			'ico_invalid_error'  => __( 'The entered IČO is not valid (invalid checksum).', 'm4w-sk-company-fields' ),
+			'dic_length_error'   => __( 'DIČ must have exactly 10 digits.', 'm4w-sk-company-fields' ),
+			'ic_dph_format_error' => __( 'IČ DPH must be in the format SK followed by 10 digits (e.g. SK1234567890).', 'm4w-sk-company-fields' ),
+			'ico_required_error' => __( 'If buying for a company, please enter at least IČO.', 'm4w-sk-company-fields' ),
+		] );
 	}
 
 	private function get_settings( $country = null ) {
@@ -122,14 +123,14 @@ class M4W_SK_Company_Fields {
 
 		add_settings_section(
 			'm4w_company_fields_section',
-			__( 'Fakturačné údaje firmy', 'm4w-sk-company-fields' ),
+			__( 'Company billing details', 'm4w-sk-company-fields' ),
 			'__return_false',
 			'm4w-sk-company-fields'
 		);
 
 		add_settings_field(
 			self::OPTION_COMPANY_FIELDS_ENABLED,
-			__( 'Zobraziť polia pre firmu na pokladni', 'm4w-sk-company-fields' ),
+			__( 'Show company fields at checkout', 'm4w-sk-company-fields' ),
 			[ $this, 'render_company_fields_enabled_field' ],
 			'm4w-sk-company-fields',
 			'm4w_company_fields_section'
@@ -139,8 +140,8 @@ class M4W_SK_Company_Fields {
 	public function register_page() {
 		add_submenu_page(
 			'woocommerce',
-			__( 'Firemné polia', 'm4w-sk-company-fields' ),
-			__( 'Firemné polia', 'm4w-sk-company-fields' ),
+			__( 'Company fields', 'm4w-sk-company-fields' ),
+			__( 'Company fields', 'm4w-sk-company-fields' ),
 			'manage_woocommerce',
 			'm4w-sk-company-fields',
 			[ $this, 'render_page' ]
@@ -153,7 +154,7 @@ class M4W_SK_Company_Fields {
 		}
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Firemné polia (IČO, DIČ, IČ DPH)', 'm4w-sk-company-fields' ); ?></h1>
+			<h1><?php esc_html_e( 'Company fields (IČO, DIČ, IČ DPH)', 'm4w-sk-company-fields' ); ?></h1>
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( 'm4w_sk_company_fields' );
@@ -173,7 +174,7 @@ class M4W_SK_Company_Fields {
 				value="1"
 				<?php checked( 1, get_option( self::OPTION_COMPANY_FIELDS_ENABLED ) ); ?>
 			/>
-			<?php esc_html_e( 'Zobraziť polia IČO, DIČ, IČ DPH a "Nakupujem na firmu" na pokladni', 'm4w-sk-company-fields' ); ?>
+			<?php esc_html_e( 'Show IČO, DIČ, IČ DPH and "Company purchase" fields at checkout', 'm4w-sk-company-fields' ); ?>
 		</label>
 		<?php
 	}
@@ -274,7 +275,7 @@ class M4W_SK_Company_Fields {
 				$newFields[ self::FIELD_BUY_ON_COMPANY ] = [
 					'type'        => 'checkbox',
 					'id'          => 'billing_company_customer',
-					'label'       => __( 'Nakupujem na firmu', 'm4w-sk-company-fields' ),
+					'label'       => __( 'I am buying for a company', 'm4w-sk-company-fields' ),
 					'input_class' => [ 'wc-enhanced-checkbox' ],
 					'priority'    => 20,
 					'class'       => [ 'form-row-wide' ],
@@ -350,7 +351,7 @@ class M4W_SK_Company_Fields {
 
 		if ( empty( $ico ) ) {
 			wc_add_notice(
-				__( 'Ak nakupujete na firmu, zadajte aspoň IČO.', 'm4w-sk-company-fields' ),
+				__( 'If buying for a company, please enter at least IČO.', 'm4w-sk-company-fields' ),
 				'error'
 			);
 		} else {
@@ -407,7 +408,7 @@ class M4W_SK_Company_Fields {
 					value="1"
 					<?php checked( $company_customer, '1' ); ?>>
 				<label for="<?php echo esc_attr( self::FIELD_BUY_ON_COMPANY ); ?>">
-					<?php _e( 'Nakupujem na firmu', 'm4w-sk-company-fields' ); ?>
+					<?php _e( 'I am buying for a company', 'm4w-sk-company-fields' ); ?>
 				</label>
 			</p>
 		</div>
@@ -432,7 +433,7 @@ class M4W_SK_Company_Fields {
 
 		woocommerce_form_field( self::FIELD_BUY_ON_COMPANY, [
 			'type'        => 'checkbox',
-			'label'       => __( 'Nakupujem na firmu', 'm4w-sk-company-fields' ),
+			'label'       => __( 'I am buying for a company', 'm4w-sk-company-fields' ),
 			'input_class' => [ 'wc-enhanced-checkbox' ],
 			'class'       => [ 'form-row-wide' ],
 		], $company_customer ? '1' : '' );
@@ -467,36 +468,11 @@ class M4W_SK_Company_Fields {
 		update_user_meta( $user_id, self::FIELD_IC_DPH, $this->get_posted_field( self::FIELD_IC_DPH ) );
 	}
 
-	/*_emails( $type, $order, $sent_to_admin, $plain_text ) {
-		if ( $type !== 'billing' || $plain_text ) {
-			return;
-		}
-
-		$ico    = self::get_ico( $order );
-		$dic    = self::get_dic( $order );
-		$ic_dph = self::get_ic_dph( $order );
-
-		if ( ! $ico && ! $dic && ! $ic_dph ) {
-			return;
-		}
-
-		echo '<br/>';
-		if ( $ico ) {
-			echo esc_html__( 'IČO', 'm4w-sk-company-fields' ) . ': ' . esc_html( $ico ) . '<br/>';
-		}
-		if ( $dic ) {
-			echo esc_html__( 'DIČ', 'm4w-sk-company-fields' ) . ': ' . esc_html( $dic ) . '<br/>';
-		}
-		if ( $ic_dph ) {
-			echo esc_html__( 'IČ DPH', 'm4w-sk-company-fields' ) . ': ' . esc_html( $ic_dph ) . '<br/>';
-		}
-	}*/
-
 	public static function validate_ico( $ico ) {
 		$ico = preg_replace( '/\s+/', '', $ico );
 
 		if ( ! preg_match( '/^\d{8}$/', $ico ) ) {
-			return __( 'IČO musí mať presne 8 číslic.', 'm4w-sk-company-fields' );
+			return __( 'IČO must have exactly 8 digits.', 'm4w-sk-company-fields' );
 		}
 
 		$weights = array( 8, 7, 6, 5, 4, 3, 2 );
@@ -510,13 +486,13 @@ class M4W_SK_Company_Fields {
 		if ( $remainder === 0 ) {
 			$check = 1;
 		} elseif ( $remainder === 1 ) {
-			return __( 'Zadané IČO nie je platné (neplatný kontrolný súčet).', 'm4w-sk-company-fields' );
+			return __( 'The entered IČO is not valid (invalid checksum).', 'm4w-sk-company-fields' );
 		} else {
 			$check = 11 - $remainder;
 		}
 
 		if ( intval( $ico[7] ) !== $check ) {
-			return __( 'Zadané IČO nie je platné (neplatný kontrolný súčet).', 'm4w-sk-company-fields' );
+			return __( 'The entered IČO is not valid (invalid checksum).', 'm4w-sk-company-fields' );
 		}
 
 		return '';
@@ -526,7 +502,7 @@ class M4W_SK_Company_Fields {
 		$dic = preg_replace( '/\s+/', '', $dic );
 
 		if ( ! preg_match( '/^\d{10}$/', $dic ) ) {
-			return __( 'DIČ musí mať presne 10 číslic.', 'm4w-sk-company-fields' );
+			return __( 'DIČ must have exactly 10 digits.', 'm4w-sk-company-fields' );
 		}
 
 		return '';
@@ -543,7 +519,7 @@ class M4W_SK_Company_Fields {
 			return '';
 		}
 
-		return __( 'IČ DPH musí byť v tvare SK za ktorým nasleduje 10 číslic (napr. SK1234567890).', 'm4w-sk-company-fields' );
+		return __( 'IČ DPH must be in the format SK followed by 10 digits (e.g. SK1234567890).', 'm4w-sk-company-fields' );
 	}
 
 	public static function get_ico( $order ) {
@@ -599,21 +575,8 @@ class M4W_SK_Company_Fields {
 	}
 }
 
-if ( ! function_exists( 'm4w_sk_company_fields_bootstrap' ) ) {
-	function m4w_sk_company_fields_bootstrap() {
-		static $loaded = false;
-
-		if ( $loaded || ( ! class_exists( 'WooCommerce' ) && ! function_exists( 'WC' ) ) ) {
-			return;
-		}
-
-		$loaded = true;
-		new M4W_SK_Company_Fields();
-	}
+function m4w_sk_company_fields_bootstrap() {
+	new M4W_SK_Company_Fields();
 }
 
-if ( did_action( 'plugins_loaded' ) ) {
-	m4w_sk_company_fields_bootstrap();
-} else {
-	add_action( 'plugins_loaded', 'm4w_sk_company_fields_bootstrap', 0 );
-}
+add_action( 'woocommerce_loaded', 'm4w_sk_company_fields_bootstrap', 0 );

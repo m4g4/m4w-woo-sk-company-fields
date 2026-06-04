@@ -1,6 +1,10 @@
 # Changelog
 
 ## 1.1.1
+- Changed default translatable strings from Slovak to English
+- Added .mo and .po translation files for sk_SK and cs_CZ
+- Made JavaScript validation strings translatable via wp_localize_script
+- Changed the way how the plugin is loaded (Woocommerce dependency loading mechanism changed)
 - Fixed My account fields bug - when OPTION_COMPANY_FIELDS_ENABLED is now checked when displaying fields under "My Account".
 
 ## 1.1.0

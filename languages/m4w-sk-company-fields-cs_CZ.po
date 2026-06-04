@@ -14,23 +14,23 @@ msgstr ""
 "X-Generator: M4W SK Company Fields\n"
 
 #: m4w-woo-sk-company-fields.php:126
-msgid "Fakturačné údaje firmy"
+msgid "Company billing details"
 msgstr "Fakturační údaje firmy"
 
 #: m4w-woo-sk-company-fields.php:133
-msgid "Zobraziť polia pre firmu na pokladni"
+msgid "Show company fields at checkout"
 msgstr "Zobrazit pole pro firmu na pokladně"
 
 #: m4w-woo-sk-company-fields.php:143 m4w-woo-sk-company-fields.php:144
-msgid "Firemné polia"
+msgid "Company fields"
 msgstr "Firemní pole"
 
 #: m4w-woo-sk-company-fields.php:157
-msgid "Firemné polia (IČO, DIČ, IČ DPH)"
+msgid "Company fields (IČO, DIČ, IČ DPH)"
 msgstr "Firemní pole (IČO, DIČ, IČ DPH)"
 
 #: m4w-woo-sk-company-fields.php:177
-msgid "Zobraziť polia IČO, DIČ, IČ DPH a \"Nakupujem na firmu\" na pokladni"
+msgid "Show IČO, DIČ, IČ DPH and \"Company purchase\" fields at checkout"
 msgstr "Zobrazit pole IČO, DIČ, IČ DPH a \"Nakupuji na firmu\" na pokladně"
 
 #: m4w-woo-sk-company-fields.php:198 m4w-woo-sk-company-fields.php:232
@@ -53,13 +53,25 @@ msgstr "IČ DPH"
 
 #: m4w-woo-sk-company-fields.php:268 m4w-woo-sk-company-fields.php:394
 #: m4w-woo-sk-company-fields.php:415
-msgid "Nakupujem na firmu"
+msgid "I am buying for a company"
 msgstr "Nakupuji na firmu"
 
-#: m4w-woo-sk-company-fields.php:362
-msgid "Detaily spoločnosti"
-msgstr "Detaily společnosti"
-
 #: m4w-woo-sk-company-fields.php:332
-msgid "Ak nakupujete na firmu, zadajte aspoň IČO."
+msgid "If buying for a company, please enter at least IČO."
 msgstr "Pokud nakupujete na firmu, zadejte alespoň IČO."
+
+#: m4w-woo-sk-company-fields.php:488
+msgid "IČO must have exactly 8 digits."
+msgstr "IČO musí mít přesně 8 číslic."
+
+#: m4w-woo-sk-company-fields.php:502 m4w-woo-sk-company-fields.php:508
+msgid "The entered IČO is not valid (invalid checksum)."
+msgstr "Zadané IČO není platné (neplatný kontrolní součet)."
+
+#: m4w-woo-sk-company-fields.php:518
+msgid "DIČ must have exactly 10 digits."
+msgstr "DIČ musí mít přesně 10 číslic."
+
+#: m4w-woo-sk-company-fields.php:535
+msgid "IČ DPH must be in the format SK followed by 10 digits (e.g. SK1234567890)."
+msgstr "IČ DPH musí být ve tvaru SK následovaném 10 číslicemi (např. SK1234567890)."

@@ -1,0 +1,77 @@
+# Copyright (C) 2024 Matulo Gabor a Mirko Ondrejka
+# This file is distributed under the MIT license.
+msgid ""
+msgstr ""
+"Project-Id-Version: M4W SK Company Fields 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: sk_SK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);\n"
+"X-Generator: M4W SK Company Fields\n"
+
+#: m4w-woo-sk-company-fields.php:126
+msgid "Company billing details"
+msgstr "Fakturačné údaje firmy"
+
+#: m4w-woo-sk-company-fields.php:133
+msgid "Show company fields at checkout"
+msgstr "Zobraziť polia pre firmu na pokladni"
+
+#: m4w-woo-sk-company-fields.php:143 m4w-woo-sk-company-fields.php:144
+msgid "Company fields"
+msgstr "Firemné polia"
+
+#: m4w-woo-sk-company-fields.php:157
+msgid "Company fields (IČO, DIČ, IČ DPH)"
+msgstr "Firemné polia (IČO, DIČ, IČ DPH)"
+
+#: m4w-woo-sk-company-fields.php:177
+msgid "Show IČO, DIČ, IČ DPH and \"Company purchase\" fields at checkout"
+msgstr "Zobraziť polia IČO, DIČ, IČ DPH a \"Nakupujem na firmu\" na pokladni"
+
+#: m4w-woo-sk-company-fields.php:198 m4w-woo-sk-company-fields.php:232
+#: m4w-woo-sk-company-fields.php:276 m4w-woo-sk-company-fields.php:277
+#: m4w-woo-sk-company-fields.php:364 m4w-woo-sk-company-fields.php:424
+msgid "IČO"
+msgstr "IČO"
+
+#: m4w-woo-sk-company-fields.php:199 m4w-woo-sk-company-fields.php:236
+#: m4w-woo-sk-company-fields.php:283 m4w-woo-sk-company-fields.php:284
+#: m4w-woo-sk-company-fields.php:367 m4w-woo-sk-company-fields.php:430
+msgid "DIČ"
+msgstr "DIČ"
+
+#: m4w-woo-sk-company-fields.php:200 m4w-woo-sk-company-fields.php:240
+#: m4w-woo-sk-company-fields.php:290 m4w-woo-sk-company-fields.php:291
+#: m4w-woo-sk-company-fields.php:370 m4w-woo-sk-company-fields.php:436
+msgid "IČ DPH"
+msgstr "IČ DPH"
+
+#: m4w-woo-sk-company-fields.php:268 m4w-woo-sk-company-fields.php:394
+#: m4w-woo-sk-company-fields.php:415
+msgid "I am buying for a company"
+msgstr "Nakupujem na firmu"
+
+#: m4w-woo-sk-company-fields.php:332
+msgid "If buying for a company, please enter at least IČO."
+msgstr "Ak nakupujete na firmu, zadajte aspoň IČO."
+
+#: m4w-woo-sk-company-fields.php:488
+msgid "IČO must have exactly 8 digits."
+msgstr "IČO musí mať presne 8 číslic."
+
+#: m4w-woo-sk-company-fields.php:502 m4w-woo-sk-company-fields.php:508
+msgid "The entered IČO is not valid (invalid checksum)."
+msgstr "Zadané IČO nie je platné (neplatný kontrolný súčet)."
+
+#: m4w-woo-sk-company-fields.php:518
+msgid "DIČ must have exactly 10 digits."
+msgstr "DIČ musí mať presne 10 číslic."
+
+#: m4w-woo-sk-company-fields.php:535
+msgid "IČ DPH must be in the format SK followed by 10 digits (e.g. SK1234567890)."
+msgstr "IČ DPH musí byť v tvare SK za ktorým nasleduje 10 číslic (napr. SK1234567890)."

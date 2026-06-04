@@ -63,7 +63,7 @@ jQuery(function ($) {
     function validateIco(ico) {
         ico = ico.replace(/\s/g, '');
         if (!/^\d{8}$/.test(ico)) {
-            return 'IČO musí mať presne 8 číslic.';
+            return m4w_sk_company_fields_params.ico_length_error;
         }
         var weights = [8, 7, 6, 5, 4, 3, 2];
         var sum = 0;
@@ -75,12 +75,12 @@ jQuery(function ($) {
         if (remainder === 0) {
             check = 1;
         } else if (remainder === 1) {
-            return 'Zadané IČO nie je platné (neplatný kontrolný súčet).';
+            return m4w_sk_company_fields_params.ico_invalid_error;
         } else {
             check = 11 - remainder;
         }
         if (parseInt(ico[7], 10) !== check) {
-            return 'Zadané IČO nie je platné (neplatný kontrolný súčet).';
+            return m4w_sk_company_fields_params.ico_invalid_error;
         }
         return '';
     }
@@ -89,7 +89,7 @@ jQuery(function ($) {
         dic = dic.replace(/\s/g, '');
         if (dic === '') return '';
         if (!/^\d{10}$/.test(dic)) {
-            return 'DIČ musí mať presne 10 číslic.';
+            return m4w_sk_company_fields_params.dic_length_error;
         }
         return '';
     }
@@ -99,7 +99,7 @@ jQuery(function ($) {
         if (icDph === '') return '';
         if (/^SK\d{10}$/.test(icDph)) return '';
         if (/^CZ\d{8,10}$/.test(icDph)) return '';
-        return 'IČ DPH musí byť v tvare SK za ktorým nasleduje 10 číslic (napr. SK1234567890).';
+        return m4w_sk_company_fields_params.ic_dph_format_error;
     }
 
     function validateField(inputSelector, validator) {
@@ -114,7 +114,7 @@ jQuery(function ($) {
 
         if (val.trim() === '') {
             if (inputSelector === '#billing_ico') {
-                setFieldInvalid(inputSelector, 'Ak nakupujete na firmu, zadajte aspoň IČO.');
+                setFieldInvalid(inputSelector, m4w_sk_company_fields_params.ico_required_error);
                 return false;
             }
             resetFieldValidation(inputSelector);
