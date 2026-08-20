@@ -2,7 +2,7 @@
 /*
  * Plugin Name: M4W SK Company Fields
  * Description: IČO, DIČ, IČ DPH and "Company purchase" fields for WooCommerce checkout (SK/CZ).
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: m4g4
  * License: MIT
  * Text Domain: m4w-sk-company-fields
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.1.1' );
+define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.1.2' );
 define( 'M4W_SK_COMPANY_FIELDS_DIR', __DIR__ );
 
 class M4W_SK_Company_Fields {
@@ -58,6 +58,8 @@ class M4W_SK_Company_Fields {
 		add_filter( 'woocommerce_formatted_address_replacements', [ $this, 'add_formatted_address_replacements' ], 10, 2 );
 		add_filter( 'woocommerce_localisation_address_formats', [ $this, 'override_address_formats' ] );
 		add_filter( 'woocommerce_admin_billing_fields', [ $this, 'add_admin_billing_fields' ], 10, 3 );
+
+		$this->register_block_country_data();
 
 		if ( ! is_admin() ) {
 			add_action( 'wp_footer', [ $this, 'enqueue_styles' ] );
@@ -189,6 +191,43 @@ class M4W_SK_Company_Fields {
 		}
 
 		return $address_formats;
+	}
+
+	public function register_block_country_data() {
+		if ( ! did_action( 'woocommerce_blocks_loaded' ) ) {
+			add_action( 'woocommerce_blocks_loaded', [ $this, 'register_block_country_data' ] );
+			return;
+		}
+
+		if ( ! class_exists( '\Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry' ) ) {
+			return;
+		}
+
+		$registry = \Automattic\WooCommerce\Blocks\Package::container()->get( \Automattic\WooCommerce\Blocks\Assets\AssetDataRegistry::class );
+		$registry->add( 'countryData', [ $this, 'get_block_country_data' ] );
+	}
+
+	public function get_block_country_data() {
+		$country_data    = \Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils::get_country_data();
+		$address_formats = WC()->countries->get_address_formats();
+
+		foreach ( $address_formats as $country_code => $format ) {
+			if ( 'default' === $country_code ) {
+				continue;
+			}
+
+			$country_data[ $country_code ]['format'] = $this->strip_address_format_tokens( $format );
+		}
+
+		return $country_data;
+	}
+
+	private function strip_address_format_tokens( $format ) {
+		return str_replace(
+			[ "{ico}\n", "{dic}\n", "{ic_dph}\n", '{ico}', '{dic}', '{ic_dph}' ],
+			'',
+			$format
+		);
 	}
 
 	public function add_formatted_address_replacements( $args, $address ) {

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.2
+- Fixed checkout Blocks (Block API) showing literal `{ico}`, `{dic}`, `{ic_dph}` placeholders: the `countryData` sent to the Blocks checkout now uses the default address format with the custom tokens removed, while server-side rendering (orders, emails, admin, account) keeps the original token-based format.
+
 ## 1.1.1
 - Changed default translatable strings from Slovak to English
 - Added .mo and .po translation files for sk_SK and cs_CZ
