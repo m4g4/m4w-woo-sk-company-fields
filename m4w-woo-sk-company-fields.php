@@ -2,7 +2,7 @@
 /*
  * Plugin Name: M4W SK Company Fields
  * Description: IČO, DIČ, IČ DPH and "Company purchase" fields for WooCommerce checkout (SK/CZ).
- * Version: 1.1.2
+ * Version: 1.2.0
  * Author: m4g4
  * License: MIT
  * Text Domain: m4w-sk-company-fields
@@ -13,8 +13,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.1.2' );
+define( 'M4W_SK_COMPANY_FIELDS_VERSION', '1.2.0' );
 define( 'M4W_SK_COMPANY_FIELDS_DIR', __DIR__ );
+
+require_once M4W_SK_COMPANY_FIELDS_DIR . '/includes/class-m4w-peppos-settings.php';
+require_once M4W_SK_COMPANY_FIELDS_DIR . '/includes/class-m4w-peppos-client.php';
+require_once M4W_SK_COMPANY_FIELDS_DIR . '/includes/class-m4w-peppos-invoice.php';
+require_once M4W_SK_COMPANY_FIELDS_DIR . '/includes/class-m4w-peppos-notifications.php';
+require_once M4W_SK_COMPANY_FIELDS_DIR . '/includes/class-m4w-peppos-admin.php';
 
 class M4W_SK_Company_Fields {
 
@@ -24,8 +30,39 @@ class M4W_SK_Company_Fields {
 	const FIELD_IC_DPH         = 'billing_ic_dph';
 
 	const OPTION_COMPANY_FIELDS_ENABLED = 'm4w_company_fields_enabled';
+	const OPTION_PEPPOL_ENABLED         = 'm4w_peppol_enabled';
+
+	const PAGE_SLUG = 'm4w-sk-company-fields';
+
+	const TAB_GENERAL  = 'general';
+	const TAB_PEPPOL   = 'peppol';
+	const TAB_INVOICES = 'invoices';
 
 	private $country_settings = [];
+
+	/**
+	 * @var M4W_Peppos_Admin|null
+	 */
+	private $peppos_admin = null;
+
+	/**
+	 * Attach the Peppos settings UI to the shared B2B settings page.
+	 *
+	 * @param M4W_Peppos_Admin $peppos_admin Peppos admin instance.
+	 * @return void
+	 */
+	public function set_peppos_admin( $peppos_admin ) {
+		$this->peppos_admin = $peppos_admin;
+	}
+
+	/**
+	 * Whether the Peppol integration is enabled in the general settings.
+	 *
+	 * @return bool
+	 */
+	public static function is_peppol_enabled() {
+		return (bool) get_option( self::OPTION_PEPPOL_ENABLED );
+	}
 
 	public function __construct() {
 		$this->country_settings = [
@@ -123,18 +160,31 @@ class M4W_SK_Company_Fields {
 			self::OPTION_COMPANY_FIELDS_ENABLED
 		);
 
+		register_setting(
+			'm4w_sk_company_fields',
+			self::OPTION_PEPPOL_ENABLED
+		);
+
 		add_settings_section(
 			'm4w_company_fields_section',
-			__( 'Company billing details', 'm4w-sk-company-fields' ),
+			__( 'Fakturačné údaje firmy', 'm4w-sk-company-fields' ),
 			'__return_false',
-			'm4w-sk-company-fields'
+			self::PAGE_SLUG
 		);
 
 		add_settings_field(
 			self::OPTION_COMPANY_FIELDS_ENABLED,
-			__( 'Show company fields at checkout', 'm4w-sk-company-fields' ),
+			__( 'Zobraziť firemné polia na pokladni', 'm4w-sk-company-fields' ),
 			[ $this, 'render_company_fields_enabled_field' ],
-			'm4w-sk-company-fields',
+			self::PAGE_SLUG,
+			'm4w_company_fields_section'
+		);
+
+		add_settings_field(
+			self::OPTION_PEPPOL_ENABLED,
+			__( 'Povoliť Peppol e-fakturáciu', 'm4w-sk-company-fields' ),
+			[ $this, 'render_peppol_enabled_field' ],
+			self::PAGE_SLUG,
 			'm4w_company_fields_section'
 		);
 	}
@@ -142,10 +192,10 @@ class M4W_SK_Company_Fields {
 	public function register_page() {
 		add_submenu_page(
 			'woocommerce',
-			__( 'Company fields', 'm4w-sk-company-fields' ),
-			__( 'Company fields', 'm4w-sk-company-fields' ),
+			__( 'B2B nastavenia', 'm4w-sk-company-fields' ),
+			__( 'B2B nastavenia', 'm4w-sk-company-fields' ),
 			'manage_woocommerce',
-			'm4w-sk-company-fields',
+			self::PAGE_SLUG,
 			[ $this, 'render_page' ]
 		);
 	}
@@ -154,16 +204,74 @@ class M4W_SK_Company_Fields {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
+
+		$tabs = [ self::TAB_GENERAL ];
+		if ( self::is_peppol_enabled() && $this->peppos_admin ) {
+			$tabs[] = self::TAB_PEPPOL;
+			if ( $this->peppos_admin->has_documents_to_show() ) {
+				$tabs[] = self::TAB_INVOICES;
+			}
+		}
+
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : self::TAB_GENERAL;
+		if ( ! in_array( $tab, $tabs, true ) ) {
+			$tab = self::TAB_GENERAL;
+		}
+
+		$general_url = add_query_arg(
+			[
+				'page' => self::PAGE_SLUG,
+				'tab'  => self::TAB_GENERAL,
+			],
+			admin_url( 'admin.php' )
+		);
+		$peppol_url  = add_query_arg(
+			[
+				'page' => self::PAGE_SLUG,
+				'tab'  => self::TAB_PEPPOL,
+			],
+			admin_url( 'admin.php' )
+		);
+		$invoices_url = add_query_arg(
+			[
+				'page' => self::PAGE_SLUG,
+				'tab'  => self::TAB_INVOICES,
+			],
+			admin_url( 'admin.php' )
+		);
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Company fields (IČO, DIČ, IČ DPH)', 'm4w-sk-company-fields' ); ?></h1>
-			<form method="post" action="options.php">
-				<?php
-				settings_fields( 'm4w_sk_company_fields' );
-				do_settings_sections( 'm4w-sk-company-fields' );
-				submit_button();
-				?>
-			</form>
+			<h1><?php esc_html_e( 'B2B nastavenia', 'm4w-sk-company-fields' ); ?></h1>
+			<nav class="nav-tab-wrapper">
+				<a href="<?php echo esc_url( $general_url ); ?>" class="nav-tab <?php echo self::TAB_GENERAL === $tab ? 'nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'Všeobecné', 'm4w-sk-company-fields' ); ?>
+				</a>
+				<?php if ( in_array( self::TAB_PEPPOL, $tabs, true ) ) : ?>
+					<a href="<?php echo esc_url( $peppol_url ); ?>" class="nav-tab <?php echo self::TAB_PEPPOL === $tab ? 'nav-tab-active' : ''; ?>">
+						<?php esc_html_e( 'Peppol', 'm4w-sk-company-fields' ); ?>
+					</a>
+				<?php endif; ?>
+				<?php if ( in_array( self::TAB_INVOICES, $tabs, true ) ) : ?>
+					<a href="<?php echo esc_url( $invoices_url ); ?>" class="nav-tab <?php echo self::TAB_INVOICES === $tab ? 'nav-tab-active' : ''; ?>">
+						<?php esc_html_e( 'Faktúry', 'm4w-sk-company-fields' ); ?>
+					</a>
+				<?php endif; ?>
+			</nav>
+
+			<?php if ( self::TAB_GENERAL === $tab ) : ?>
+				<?php settings_errors(); ?>
+				<form method="post" action="options.php">
+					<?php
+					settings_fields( 'm4w_sk_company_fields' );
+					do_settings_sections( self::PAGE_SLUG );
+					submit_button( __( 'Uložiť zmeny', 'm4w-sk-company-fields' ) );
+					?>
+				</form>
+			<?php elseif ( self::TAB_PEPPOL === $tab ) : ?>
+				<?php $this->peppos_admin->render_tab_content(); ?>
+			<?php elseif ( self::TAB_INVOICES === $tab ) : ?>
+				<?php $this->peppos_admin->render_documents_tab(); ?>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -176,7 +284,20 @@ class M4W_SK_Company_Fields {
 				value="1"
 				<?php checked( 1, get_option( self::OPTION_COMPANY_FIELDS_ENABLED ) ); ?>
 			/>
-			<?php esc_html_e( 'Show IČO, DIČ, IČ DPH and "Company purchase" fields at checkout', 'm4w-sk-company-fields' ); ?>
+			<?php esc_html_e( 'Zobraziť polia IČO, DIČ, IČ DPH a „Nakupujem na firmu“ na pokladni', 'm4w-sk-company-fields' ); ?>
+		</label>
+		<?php
+	}
+
+	public function render_peppol_enabled_field() {
+		?>
+		<label>
+			<input type="checkbox"
+				name="<?php echo esc_attr( self::OPTION_PEPPOL_ENABLED ); ?>"
+				value="1"
+				<?php checked( 1, get_option( self::OPTION_PEPPOL_ENABLED ) ); ?>
+			/>
+			<?php esc_html_e( 'Zapnúť integráciu Peppol.', 'm4w-sk-company-fields' ); ?>
 		</label>
 		<?php
 	}
@@ -615,7 +736,17 @@ class M4W_SK_Company_Fields {
 }
 
 function m4w_sk_company_fields_bootstrap() {
-	new M4W_SK_Company_Fields();
+	$company_fields = new M4W_SK_Company_Fields();
+
+	$peppos_client        = new M4W_Peppos_Client();
+	$peppos_invoice       = new M4W_Peppos_Invoice( $peppos_client );
+	$peppos_notifications = new M4W_Peppos_Notifications( $peppos_client );
+
+	$peppos_invoice->init();
+	$peppos_notifications->init();
+
+	$peppos_admin = new M4W_Peppos_Admin( $peppos_invoice );
+	$company_fields->set_peppos_admin( $peppos_admin );
 }
 
 add_action( 'woocommerce_loaded', 'm4w_sk_company_fields_bootstrap', 0 );

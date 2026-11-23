@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+- Added Peppos (Dativery Pepposh) e-invoicing integration for B2B orders.
+- Added a single WooCommerce > B2B nastavenia page with "Všeobecné", "Peppol" and "Faktúry" tabs; all settings are in Slovak.
+
 ## 1.1.2
 - Fixed checkout Blocks (Block API) showing literal `{ico}`, `{dic}`, `{ic_dph}` placeholders: the `countryData` sent to the Blocks checkout now uses the default address format with the custom tokens removed, while server-side rendering (orders, emails, admin, account) keeps the original token-based format.
 
